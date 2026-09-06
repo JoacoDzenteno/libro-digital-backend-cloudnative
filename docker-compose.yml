@@ -1,0 +1,199 @@
+services:
+  # ---------- SonarQube (ya existente) ----------
+  db-sonarqube:
+    image: postgres:16-alpine
+    container_name: db-sonarqube
+    environment:
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: sonar_password_1234
+      POSTGRES_DB: sonar
+    volumes:
+      - sonar-db-data:/var/lib/postgresql/data
+    networks:
+      - sonar-net
+
+  sonarqube:
+    image: sonarqube:community
+    container_name: sonarqube
+    depends_on:
+      - db-sonarqube
+    environment:
+      SONAR_JDBC_USERNAME: sonar
+      SONAR_JDBC_PASSWORD: sonar_password_1234
+      SONAR_JDBC_URL: jdbc:postgresql://db-sonarqube:5432/sonar
+    ports:
+      - "9000:9000"
+    volumes:
+      - sonar-data:/opt/sonarqube/data
+      - sonar-extensions:/opt/sonarqube/extensions
+      - sonar-logs:/opt/sonarqube/logs
+    networks:
+      - sonar-net
+
+  # ---------- Backend Libro Digital ----------
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres-libro-digital
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./docker/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - spring-net
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - spring-net
+
+  eureka-server:
+    build: ./eureka-server
+    container_name: eureka-server
+    environment:
+      EUREKA_INSTANCE_HOSTNAME: eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - spring-net
+
+  ms-usuarios:
+    build: ./ms-usuarios
+    container_name: ms-usuarios
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/db_usuarios
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    ports:
+      - "8081:8081"
+    networks:
+      - spring-net
+
+  ms-academico:
+    build: ./ms-academico
+    container_name: ms-academico
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/db_academico
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    ports:
+      - "8082:8082"
+    networks:
+      - spring-net
+
+  ms-matricula:
+    build: ./ms-matricula
+    container_name: ms-matricula
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/db_matricula
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    ports:
+      - "8083:8083"
+    networks:
+      - spring-net
+
+  ms-libro-digital:
+    build: ./ms-libro-digital
+    container_name: ms-libro-digital
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/db_libro_digital
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      SPRING_RABBITMQ_HOST: rabbitmq
+    ports:
+      - "8084:8084"
+    networks:
+      - spring-net
+
+  ms-comunicaciones:
+    build: ./ms-comunicaciones
+    container_name: ms-comunicaciones
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/db_comunicaciones
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      SPRING_RABBITMQ_HOST: rabbitmq
+    ports:
+      - "8085:8085"
+    networks:
+      - spring-net
+
+  ms-reportes:
+    build: ./ms-reportes
+    container_name: ms-reportes
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/db_reportes
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      SPRING_RABBITMQ_HOST: rabbitmq
+    ports:
+      - "8086:8086"
+    networks:
+      - spring-net
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    depends_on:
+      eureka-server:
+        condition: service_started
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    ports:
+      - "8080:8080"
+    networks:
+      - spring-net
+
+networks:
+  sonar-net:
+  spring-net:
+
+volumes:
+  sonar-db-data:
+  sonar-data:
+  sonar-extensions:
+  sonar-logs:
+  postgres-data:

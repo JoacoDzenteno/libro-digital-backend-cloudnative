@@ -1,0 +1,51 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      server:
+        webmvc:
+          routes:
+            - id: ms-auth
+              uri: lb://ms-usuarios
+              predicates:
+                - Path=/api/auth/**
+            - id: ms-usuarios
+              uri: lb://ms-usuarios
+              predicates:
+                - Path=/api/usuarios/**
+            - id: ms-academico
+              uri: lb://ms-academico
+              predicates:
+                - Path=/api/academico/**
+            - id: ms-matricula
+              uri: lb://ms-matricula
+              predicates:
+                - Path=/api/matricula/**
+            - id: ms-libro-digital
+              uri: lb://ms-libro-digital
+              predicates:
+                - Path=/api/libro/**
+            - id: ms-comunicaciones
+              uri: lb://ms-comunicaciones
+              predicates:
+                - Path=/api/comunicaciones/**
+            - id: ms-reportes
+              uri: lb://ms-reportes
+              predicates:
+                - Path=/api/reportes/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+app:
+  jwt:
+    secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+    expiration: 86400000
