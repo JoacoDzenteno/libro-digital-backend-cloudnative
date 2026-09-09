@@ -1,0 +1,3 @@
+# Los scripts de shell se quedan con saltos de linea LF en todos los sistemas.
+# Si Git los convierte a CRLF, bash falla con $'\r': command not found.
+*.sh text eol=lf
