@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 
-import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +35,10 @@ public class UsuarioService {
 
     public Optional<UsuarioDTO> obtenerPorEmail(String email) {
         return usuarioRepository.findByEmail(email).map(this::toDTO);
+    }
+
+    public Optional<UsuarioDTO> obtenerPorAzureOid(String azureOid) {
+        return usuarioRepository.findByAzureOid(azureOid).map(this::toDTO);
     }
 
     public List<UsuarioDTO> obtenerPorRol(Usuario.Rol rol) {
@@ -118,6 +121,4 @@ public class UsuarioService {
         return toDTO(usuarioRepository.save(u));
     });
     }
-
-    
 }

@@ -13,6 +13,7 @@ import java.util.Optional;
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     Optional<Usuario> findByEmail(String email);
+    Optional<Usuario> findByAzureOid(String azureOid);
     List<Usuario> findByRol(Usuario.Rol rol);
 
     @Query("SELECT u FROM Usuario u JOIN u.persona p WHERE " +

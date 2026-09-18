@@ -7,6 +7,8 @@ import cl.bernardo.ohiggins.ms_usuarios.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,6 +19,14 @@ import java.util.List;
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
+
+    @GetMapping("/me")
+    public ResponseEntity<UsuarioDTO> obtenerMiPerfil(@AuthenticationPrincipal Jwt jwt) {
+        String azureOid = jwt.getClaimAsString("oid");
+        return usuarioService.obtenerPorAzureOid(azureOid)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
 
     @GetMapping
     public ResponseEntity<List<UsuarioDTO>> obtenerTodos() {

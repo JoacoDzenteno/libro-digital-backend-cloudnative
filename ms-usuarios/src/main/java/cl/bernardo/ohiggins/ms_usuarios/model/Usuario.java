@@ -21,6 +21,9 @@ public class Usuario {
     @Column(nullable = false)
     private String password;
 
+    @Column(name = "azure_oid", unique = true)
+    private String azureOid;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Rol rol;
