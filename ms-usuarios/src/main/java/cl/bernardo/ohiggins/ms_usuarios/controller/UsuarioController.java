@@ -22,7 +22,19 @@ public class UsuarioController {
 
     @GetMapping("/me")
     public ResponseEntity<UsuarioDTO> obtenerMiPerfil(@AuthenticationPrincipal Jwt jwt) {
+        if (jwt == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         String azureOid = jwt.getClaimAsString("oid");
+        if (azureOid == null) {
+            azureOid = jwt.getSubject();
+        }
+
+        if (azureOid == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
         return usuarioService.obtenerPorAzureOid(azureOid)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -69,7 +81,7 @@ public class UsuarioController {
 
     @PutMapping("/{id}")
     public ResponseEntity<UsuarioDTO> actualizar(@PathVariable Long id,
-                                                  @RequestBody Usuario usuario) {
+                                                 @RequestBody Usuario usuario) {
         return usuarioService.actualizar(id, usuario)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -85,7 +97,7 @@ public class UsuarioController {
 
     @PutMapping("/{id}/perfil")
     public ResponseEntity<UsuarioDTO> actualizarPerfil(@PathVariable Long id,
-                                                        @RequestBody ActualizarPerfilRequest request) {
+                                                       @RequestBody ActualizarPerfilRequest request) {
         return usuarioService.actualizarPerfil(id, request.getNuevoEmail(), request.getNuevaPassword())
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
