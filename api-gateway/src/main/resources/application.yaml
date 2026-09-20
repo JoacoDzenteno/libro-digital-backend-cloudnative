@@ -10,39 +10,44 @@ spring:
         webmvc:
           routes:
             - id: ms-usuarios
-              uri: http://localhost:8081
+              uri: lb://ms-usuarios
               predicates:
                 - Path=/api/usuarios/**
             - id: ms-academico
-              uri: http://localhost:8082
+              uri: lb://ms-academico
               predicates:
                 - Path=/api/academico/**
             - id: ms-matricula
-              uri: http://localhost:8083
+              uri: lb://ms-matricula
               predicates:
                 - Path=/api/matricula/**
             - id: ms-libro-digital
-              uri: http://localhost:8084
+              uri: lb://ms-libro-digital
               predicates:
                 - Path=/api/libro/**
             - id: ms-comunicaciones
-              uri: http://localhost:8085
+              uri: lb://ms-comunicaciones
               predicates:
                 - Path=/api/comunicaciones/**
             - id: ms-reportes
-              uri: http://localhost:8086
+              uri: lb://ms-reportes
               predicates:
                 - Path=/api/reportes/**
   security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: https://login.microsoftonline.com/1148f910-11c6-41a3-94d3-dedca0cefa9c/v2.0
+          issuer-uri: ${ENTRA_ISSUER_URI:https://login.microsoftonline.com/1148f910-11c6-41a3-94d3-dedca0cefa9c/v2.0}
 
 eureka:
   client:
-    enabled: false
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}
+  instance:
+    prefer-ip-address: true
 
 app:
   jwt:
-    secret: "c3VwZXJTZWNyZXRLZXlGb3JKS1RUZXN0aW5nS2V5MTIzNDU2Nzg5MDEyMzQ1Njc4OTA="
+    audience: ${ENTRA_API_CLIENT_ID:3ac3ede1-1d05-42df-8248-3fbde4240a87}
+  cors:
+    allowed-origins: ${CORS_ORIGINS:http://localhost:5173}
