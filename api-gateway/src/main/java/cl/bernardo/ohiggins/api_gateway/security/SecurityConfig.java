@@ -80,7 +80,7 @@ public class SecurityConfig {
                 // Cualquier usuario autenticado necesita poder resolver su propia
                 // identidad interna. Va ANTES de la regla general de /api/usuarios:
                 // en Spring Security gana la primera coincidencia.
-                        .requestMatchers("/api/usuarios/me").authenticated()
+                        .requestMatchers("/api/usuarios/me", "/api/usuarios/directorio").authenticated()
                         .requestMatchers("/api/usuarios/**").hasRole("ADMINISTRATIVO")
 
                 // Un apoderado puede consultar las matriculas de sus pupilos.

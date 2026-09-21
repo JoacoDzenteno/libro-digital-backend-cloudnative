@@ -1,19 +1,20 @@
 package cl.bernardo.ohiggins.ms_usuarios.service;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import cl.bernardo.ohiggins.ms_usuarios.dto.ContactoDTO;
 import cl.bernardo.ohiggins.ms_usuarios.dto.UsuarioDTO;
 import cl.bernardo.ohiggins.ms_usuarios.model.Persona;
 import cl.bernardo.ohiggins.ms_usuarios.model.Usuario;
 import cl.bernardo.ohiggins.ms_usuarios.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.PageRequest;
-
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +28,21 @@ public class UsuarioService {
                 .stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
+    }
+
+    public List<ContactoDTO> obtenerDirectorio() {
+    return usuarioRepository.findAll()
+            .stream()
+            .map(u -> {
+                Persona p = u.getPersona();
+                return ContactoDTO.builder()
+                        .id(u.getId())
+                        .nombre(p != null ? p.getNombre() : null)
+                        .apellido(p != null ? p.getApellido() : null)
+                        .rol(u.getRol())
+                        .build();
+            })
+            .collect(Collectors.toList());
     }
 
     public Optional<UsuarioDTO> obtenerPorId(Long id) {

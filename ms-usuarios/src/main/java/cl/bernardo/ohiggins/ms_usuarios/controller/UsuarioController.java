@@ -1,17 +1,27 @@
 package cl.bernardo.ohiggins.ms_usuarios.controller;
 
-import cl.bernardo.ohiggins.ms_usuarios.dto.ActualizarPerfilRequest;
-import cl.bernardo.ohiggins.ms_usuarios.dto.UsuarioDTO;
-import cl.bernardo.ohiggins.ms_usuarios.model.Usuario;
-import cl.bernardo.ohiggins.ms_usuarios.service.UsuarioService;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import cl.bernardo.ohiggins.ms_usuarios.dto.ActualizarPerfilRequest;
+import cl.bernardo.ohiggins.ms_usuarios.dto.ContactoDTO;
+import cl.bernardo.ohiggins.ms_usuarios.dto.UsuarioDTO;
+import cl.bernardo.ohiggins.ms_usuarios.model.Usuario;
+import cl.bernardo.ohiggins.ms_usuarios.service.UsuarioService;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -38,6 +48,11 @@ public class UsuarioController {
         return usuarioService.obtenerPorAzureOid(azureOid)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+    
+    @GetMapping("/directorio")
+    public ResponseEntity<List<ContactoDTO>> obtenerDirectorio() {
+        return ResponseEntity.ok(usuarioService.obtenerDirectorio());
     }
 
     @GetMapping
