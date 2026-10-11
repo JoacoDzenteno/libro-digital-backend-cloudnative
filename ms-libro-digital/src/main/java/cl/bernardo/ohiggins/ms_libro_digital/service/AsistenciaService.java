@@ -43,7 +43,7 @@ public class AsistenciaService {
         }
         Asistencia guardada = asistenciaRepository.save(asistencia);
 
-        notificacionPublisher.publicarNotificacion(NotificacionEvent.builder()
+        notificacionPublisher.publicarAsistencia(NotificacionEvent.builder()
                 .idEstudiante(guardada.getIdEstudiante())
                 .asunto("Nueva asistencia registrada")
                 .contenido("Se registró asistencia con estado: " + guardada.getEstado())

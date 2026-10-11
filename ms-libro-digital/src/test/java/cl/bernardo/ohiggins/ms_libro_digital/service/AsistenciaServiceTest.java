@@ -98,7 +98,7 @@ class AsistenciaServiceTest {
 
         assertTrue(resultado.isEmpty());
         verify(asistenciaRepository, never()).save(any());
-        verify(notificacionPublisher, never()).publicarNotificacion(any());
+        verify(notificacionPublisher, never()).publicarAsistencia(any());
     }
 
     @Test
@@ -116,7 +116,7 @@ class AsistenciaServiceTest {
 
         assertNotNull(nueva.getFecha());
         assertTrue(resultado.isPresent());
-        verify(notificacionPublisher).publicarNotificacion(any());
+        verify(notificacionPublisher).publicarAsistencia(any());
     }
 
     @Test

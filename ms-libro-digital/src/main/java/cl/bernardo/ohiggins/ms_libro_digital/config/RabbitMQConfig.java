@@ -1,24 +1,24 @@
 package cl.bernardo.ohiggins.ms_libro_digital.config;
 
-import org.springframework.amqp.core.*;
-import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RabbitMQConfig {
 
-    public static final String EXCHANGE_NAME = "libro-digital-exchange";
-    public static final String ROUTING_KEY_NOTIFICACION = "libro.notificacion";
-    public static final String ROUTING_KEY_REPORTE = "libro.reporte";
-    
+    // Se lee el nombre desde application.yaml en lugar de tenerlo quemado
+    @Value("${mensajeria.exchange}")
+    private String exchangeName;
 
     @Bean
     public TopicExchange exchange() {
-        return new TopicExchange(EXCHANGE_NAME);
+        return new TopicExchange(exchangeName);
     }
+
     @Bean
     public MessageConverter messageConverter() {
         return new Jackson2JsonMessageConverter();

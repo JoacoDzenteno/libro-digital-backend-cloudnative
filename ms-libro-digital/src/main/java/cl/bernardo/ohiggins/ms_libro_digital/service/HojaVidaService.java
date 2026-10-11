@@ -39,7 +39,7 @@ public class HojaVidaService {
         }
         HojaVida guardada = hojaVidaRepository.save(hojaVida);
 
-        notificacionPublisher.publicarNotificacion(NotificacionEvent.builder()
+        notificacionPublisher.publicarHojaVida(NotificacionEvent.builder()
                 .idEstudiante(guardada.getIdEstudiante())
                 .asunto("Nueva anotación en hoja de vida")
                 .contenido("Se registró una anotación " + guardada.getTipo() + ": " + guardada.getDescripcion())

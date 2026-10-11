@@ -44,16 +44,17 @@ public class CalificacionService {
         }
         Calificacion guardada = calificacionRepository.save(calificacion);
 
-        notificacionPublisher.publicarNotificacion(NotificacionEvent.builder()
+        notificacionPublisher.publicarCalificacion(NotificacionEvent.builder()
                 .idEstudiante(guardada.getIdEstudiante())
                 .asunto("Nueva calificación registrada")
                 .contenido("Se registró una nota de " + guardada.getNota() + " en el período " + guardada.getPeriodo())
                 .tipoEvento("CALIFICACION")
                 .build());
         
-        notificacionPublisher.publicarReporte(ReporteEvent.builder()
+        notificacionPublisher.publicarReporteCalificacion(ReporteEvent.builder()
                 .idEstudiante(guardada.getIdEstudiante())
-                .idGeneradoPor(1L) // admin@colegio.cl — Calificacion no registra qué profesor la creó, se usa el admin como generador del sistema
+                .idCurso(guardada.getIdCurso()) // Usamos idCurso en lugar del antiguo idGeneradoPor
+                .tipoReporte("CALIFICACION") // Agregamos el tipo de reporte requerido
                 .contenido("Calificación " + guardada.getNota() + " registrada en el período " + guardada.getPeriodo())
                 .build());
 

@@ -103,7 +103,7 @@ class HojaVidaServiceTest {
 
         assertNotNull(nueva.getFecha());
         assertNotNull(resultado);
-        verify(notificacionPublisher).publicarNotificacion(any());
+        verify(notificacionPublisher).publicarHojaVida(any());
     }
 
     @Test

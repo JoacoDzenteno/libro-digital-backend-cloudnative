@@ -117,8 +117,8 @@ class CalificacionServiceTest {
 
         assertNotNull(nueva.getFecha());
         assertNotNull(resultado);
-        verify(notificacionPublisher).publicarNotificacion(any());
-        verify(notificacionPublisher).publicarReporte(any());
+        verify(notificacionPublisher).publicarCalificacion(any());
+        verify(notificacionPublisher).publicarReporteCalificacion(any());
     }
 
     @Test
