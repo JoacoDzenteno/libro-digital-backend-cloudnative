@@ -1,6 +1,5 @@
 package cl.bernardo.ohiggins.ms_reportes.service;
 
-import cl.bernardo.ohiggins.ms_reportes.config.RabbitMQConfig;
 import cl.bernardo.ohiggins.ms_reportes.dto.ReporteEvent;
 import cl.bernardo.ohiggins.ms_reportes.model.Reporte;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +12,7 @@ public class ReporteEventListener {
 
     private final ReporteService reporteService;
 
-    @RabbitListener(queues = RabbitMQConfig.QUEUE_REPORTES)
+    @RabbitListener(queues = "${mensajeria.calificacion-reporte.cola}")
     public void recibirEventoCalificacion(ReporteEvent evento) {
         Reporte reporte = Reporte.builder()
                 .titulo("Reporte automático de calificación")
