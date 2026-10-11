@@ -1,6 +1,5 @@
 package cl.bernardo.ohiggins.ms_comunicaciones.service;
 
-import cl.bernardo.ohiggins.ms_comunicaciones.config.RabbitMQConfig;
 import cl.bernardo.ohiggins.ms_comunicaciones.dto.NotificacionEvent;
 import cl.bernardo.ohiggins.ms_comunicaciones.model.Mensaje;
 import cl.bernardo.ohiggins.ms_comunicaciones.repository.MensajeRepository;
@@ -17,7 +16,7 @@ public class NotificacionListener {
     private final MatriculaClientService matriculaClientService;
     private final MensajeRepository mensajeRepository;
 
-    @RabbitListener(queues = RabbitMQConfig.QUEUE_NAME)
+    @RabbitListener(queues = "${mensajeria.asistencia.cola}")
     public void recibirNotificacion(NotificacionEvent evento) {
         Long idApoderado = matriculaClientService.obtenerIdApoderado(evento.getIdEstudiante());
 
