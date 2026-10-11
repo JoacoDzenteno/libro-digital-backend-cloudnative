@@ -18,6 +18,9 @@ spring:
     port: 5672
     username: guest
     password: guest
+    listener:
+      simple:
+        acknowledge-mode: manual
 
 eureka:
   client:
@@ -25,3 +28,19 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
   instance:
     prefer-ip-address: true
+
+mensajeria:
+  exchange: libro-digital-exchange
+  dlx: libro-digital-dlx
+  asistencia:
+    routing-key: libro.asistencia.registrada
+    cola: comunicaciones-asistencia-queue
+    dlq: comunicaciones-asistencia-dlq
+  calificacion-notificacion:
+    routing-key: libro.calificacion.notificacion
+    cola: comunicaciones-calificacion-queue
+    dlq: comunicaciones-calificacion-dlq
+  hoja-vida:
+    routing-key: libro.hojavida.registrada
+    cola: comunicaciones-hojavida-queue
+    dlq: comunicaciones-hojavida-dlq
