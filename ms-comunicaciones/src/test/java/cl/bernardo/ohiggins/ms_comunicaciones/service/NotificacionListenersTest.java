@@ -1,10 +1,13 @@
 package cl.bernardo.ohiggins.ms_comunicaciones.service;
 
 import cl.bernardo.ohiggins.ms_comunicaciones.dto.NotificacionEvent;
+import com.rabbitmq.client.Channel;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.io.IOException;
 
 import static org.mockito.Mockito.verify;
 
@@ -13,6 +16,11 @@ class NotificacionListenersTest {
 
     @Mock
     private NotificacionProcesador procesador;
+
+    @Mock
+    private Channel channel;
+
+    private final ConfirmadorMensajes confirmador = new ConfirmadorMensajes();
 
     private NotificacionEvent evento() {
         return NotificacionEvent.builder()
@@ -23,23 +31,26 @@ class NotificacionListenersTest {
     }
 
     @Test
-    void asistenciaListener_delegaAlProcesador() {
+    void asistenciaListener_procesaYConfirmaConAck() throws IOException {
         NotificacionEvent e = evento();
-        new AsistenciaListener(procesador).recibir(e);
+        new AsistenciaListener(procesador, confirmador).recibir(e, channel, 1L);
         verify(procesador).procesar(e);
+        verify(channel).basicAck(1L, false);
     }
 
     @Test
-    void calificacionListener_delegaAlProcesador() {
+    void calificacionListener_procesaYConfirmaConAck() throws IOException {
         NotificacionEvent e = evento();
-        new CalificacionListener(procesador).recibir(e);
+        new CalificacionListener(procesador, confirmador).recibir(e, channel, 2L);
         verify(procesador).procesar(e);
+        verify(channel).basicAck(2L, false);
     }
 
     @Test
-    void hojaVidaListener_delegaAlProcesador() {
+    void hojaVidaListener_procesaYConfirmaConAck() throws IOException {
         NotificacionEvent e = evento();
-        new HojaVidaListener(procesador).recibir(e);
+        new HojaVidaListener(procesador, confirmador).recibir(e, channel, 3L);
         verify(procesador).procesar(e);
+        verify(channel).basicAck(3L, false);
     }
 }

@@ -1,11 +1,14 @@
 package cl.bernardo.ohiggins.ms_comunicaciones.service;
 
+import cl.bernardo.ohiggins.ms_comunicaciones.exception.ServicioNoDisponibleException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -82,10 +85,22 @@ class MatriculaClientServiceTest {
     }
 
     @Test
-    void obtenerIdApoderado_excepcion_retornaNull() {
+    void obtenerIdApoderado_servicioCaido_lanzaServicioNoDisponible() {
         doReturn(uriSpec).when(webClient).get();
         doReturn(headersSpec).when(uriSpec).uri(anyString());
         doThrow(new RuntimeException("Servicio caído")).when(headersSpec).retrieve();
+
+        assertThrows(ServicioNoDisponibleException.class,
+                () -> matriculaClientService.obtenerIdApoderado(2L));
+    }
+
+    @Test
+    void obtenerIdApoderado_respuesta404_retornaNull() {
+        doReturn(uriSpec).when(webClient).get();
+        doReturn(headersSpec).when(uriSpec).uri(anyString());
+        doReturn(responseSpec).when(headersSpec).retrieve();
+        doThrow(WebClientResponseException.create(404, "Not Found", HttpHeaders.EMPTY, new byte[0], null))
+                .when(responseSpec).bodyToMono(List.class);
 
         Long resultado = matriculaClientService.obtenerIdApoderado(2L);
 

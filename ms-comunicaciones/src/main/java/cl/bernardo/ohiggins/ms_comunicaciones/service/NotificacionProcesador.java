@@ -1,6 +1,7 @@
 package cl.bernardo.ohiggins.ms_comunicaciones.service;
 
 import cl.bernardo.ohiggins.ms_comunicaciones.dto.NotificacionEvent;
+import cl.bernardo.ohiggins.ms_comunicaciones.exception.ApoderadoNoEncontradoException;
 import cl.bernardo.ohiggins.ms_comunicaciones.model.Mensaje;
 import cl.bernardo.ohiggins.ms_comunicaciones.repository.MensajeRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,11 +16,19 @@ public class NotificacionProcesador {
     private final MatriculaClientService matriculaClientService;
     private final MensajeRepository mensajeRepository;
 
+    /**
+     * Guarda el aviso para el apoderado del estudiante.
+     *
+     * @throws ApoderadoNoEncontradoException (NO RECUPERABLE) si el estudiante no tiene apoderado
+     * @throws cl.bernardo.ohiggins.ms_comunicaciones.exception.ServicioNoDisponibleException
+     *         (RECUPERABLE) si ms-matricula no responde
+     */
     public void procesar(NotificacionEvent evento) {
         Long idApoderado = matriculaClientService.obtenerIdApoderado(evento.getIdEstudiante());
 
         if (idApoderado == null) {
-            return; // No se encontró apoderado, no se puede notificar
+            throw new ApoderadoNoEncontradoException(
+                    "El estudiante " + evento.getIdEstudiante() + " no tiene apoderado");
         }
 
         Mensaje mensaje = Mensaje.builder()

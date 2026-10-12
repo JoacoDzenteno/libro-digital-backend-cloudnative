@@ -1,6 +1,7 @@
 package cl.bernardo.ohiggins.ms_comunicaciones.service;
 
 import cl.bernardo.ohiggins.ms_comunicaciones.dto.NotificacionEvent;
+import cl.bernardo.ohiggins.ms_comunicaciones.exception.ApoderadoNoEncontradoException;
 import cl.bernardo.ohiggins.ms_comunicaciones.model.Mensaje;
 import cl.bernardo.ohiggins.ms_comunicaciones.repository.MensajeRepository;
 import org.junit.jupiter.api.Test;
@@ -25,34 +26,29 @@ class NotificacionProcesadorTest {
     @InjectMocks
     private NotificacionProcesador procesador;
 
-    @Test
-    void procesar_sinApoderado_noGuardaMensaje() {
-        NotificacionEvent evento = NotificacionEvent.builder()
+    private NotificacionEvent evento() {
+        return NotificacionEvent.builder()
                 .idEstudiante(2L)
                 .asunto("Nueva calificación")
                 .contenido("Se registró una nota")
                 .tipoEvento("CALIFICACION")
                 .build();
+    }
 
+    @Test
+    void procesar_sinApoderado_lanzaExcepcionYNoGuarda() {
         when(matriculaClientService.obtenerIdApoderado(2L)).thenReturn(null);
 
-        procesador.procesar(evento);
+        assertThrows(ApoderadoNoEncontradoException.class, () -> procesador.procesar(evento()));
 
         verify(mensajeRepository, never()).save(any());
     }
 
     @Test
     void procesar_conApoderado_guardaMensajeCorrecto() {
-        NotificacionEvent evento = NotificacionEvent.builder()
-                .idEstudiante(2L)
-                .asunto("Nueva calificación")
-                .contenido("Se registró una nota")
-                .tipoEvento("CALIFICACION")
-                .build();
-
         when(matriculaClientService.obtenerIdApoderado(2L)).thenReturn(3L);
 
-        procesador.procesar(evento);
+        procesador.procesar(evento());
 
         ArgumentCaptor<Mensaje> captor = ArgumentCaptor.forClass(Mensaje.class);
         verify(mensajeRepository).save(captor.capture());
