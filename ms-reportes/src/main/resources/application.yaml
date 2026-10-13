@@ -36,3 +36,6 @@ mensajeria:
     routing-key: libro.calificacion.reporte
     cola: reportes-calificacion-queue
     dlq: reportes-calificacion-dlq
+
+    reportes:
+  generador-por-defecto: 1

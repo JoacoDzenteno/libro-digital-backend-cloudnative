@@ -2,13 +2,19 @@ package cl.bernardo.ohiggins.ms_reportes.dto;
 
 import lombok.*;
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class ReporteEvent implements Serializable {
+    private UUID eventoId;
+    private LocalDateTime fecha;
+
     private Long idEstudiante;
-    private Long idGeneradoPor;
+    private Long idCurso;
+    private String tipoReporte;
     private String contenido;
 }
