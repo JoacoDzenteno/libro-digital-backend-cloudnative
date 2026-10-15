@@ -56,6 +56,11 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - spring-net
 
@@ -126,7 +131,7 @@ services:
       eureka-server:
         condition: service_started
       rabbitmq:
-        condition: service_started
+        condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/db_libro_digital
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
@@ -145,7 +150,7 @@ services:
       eureka-server:
         condition: service_started
       rabbitmq:
-        condition: service_started
+        condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/db_comunicaciones
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
@@ -164,7 +169,7 @@ services:
       eureka-server:
         condition: service_started
       rabbitmq:
-        condition: service_started
+        condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/db_reportes
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
