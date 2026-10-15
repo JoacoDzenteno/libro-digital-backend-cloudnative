@@ -179,6 +179,23 @@ services:
     networks:
       - spring-net
 
+  ms-rabbit-admin:
+    build: ./ms-rabbit-admin
+    container_name: ms-rabbit-admin
+    depends_on:
+      eureka-server:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      SPRING_RABBITMQ_HOST: rabbitmq
+    ports:
+      - "8087:8087"
+    networks:
+      - spring-net
+
+
   api-gateway:
     build: ./api-gateway
     container_name: api-gateway

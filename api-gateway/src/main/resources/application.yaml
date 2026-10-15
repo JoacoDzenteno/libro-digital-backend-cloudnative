@@ -33,6 +33,10 @@ spring:
               uri: lb://ms-reportes
               predicates:
                 - Path=/api/reportes/**
+            - id: ms-rabbit-admin
+              uri: lb://ms-rabbit-admin
+              predicates:
+                - Path=/api/rabbit/**
   security:
     oauth2:
       resourceserver:

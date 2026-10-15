@@ -76,23 +76,27 @@ public class SecurityConfig {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
-                        .authorizeHttpRequests(auth -> auth
+            .authorizeHttpRequests(auth -> auth
                 // Cualquier usuario autenticado necesita poder resolver su propia
                 // identidad interna. Va ANTES de la regla general de /api/usuarios:
                 // en Spring Security gana la primera coincidencia.
-                        .requestMatchers("/api/usuarios/me", "/api/usuarios/directorio").authenticated()
-                        .requestMatchers("/api/usuarios/**").hasRole("ADMINISTRATIVO")
+                .requestMatchers("/api/usuarios/me", "/api/usuarios/directorio").authenticated()
+                .requestMatchers("/api/usuarios/**").hasRole("ADMINISTRATIVO")
 
                 // Un apoderado puede consultar las matriculas de sus pupilos.
-                    .requestMatchers("/api/matricula/apoderado/**").hasAnyRole("ADMINISTRATIVO", "APODERADO")
-                    .requestMatchers("/api/matricula/**").hasRole("ADMINISTRATIVO")
+                .requestMatchers("/api/matricula/apoderado/**").hasAnyRole("ADMINISTRATIVO", "APODERADO")
+                .requestMatchers("/api/matricula/**").hasRole("ADMINISTRATIVO")
 
-                    .requestMatchers("/api/academico/**").hasAnyRole("ADMINISTRATIVO", "PROFESOR")
-                    .requestMatchers("/api/reportes/**").hasAnyRole("ADMINISTRATIVO", "PROFESOR")
-                    .requestMatchers("/api/libro/**").hasAnyRole("ADMINISTRATIVO", "PROFESOR", "ESTUDIANTE", "APODERADO")
-                    .requestMatchers("/api/comunicaciones/**").authenticated()
-                    .anyRequest().authenticated()
-                )
+                .requestMatchers("/api/academico/**").hasAnyRole("ADMINISTRATIVO", "PROFESOR")
+                .requestMatchers("/api/reportes/**").hasAnyRole("ADMINISTRATIVO", "PROFESOR")
+
+                // Administracion de RabbitMQ (ms-rabbit-admin): solo personal administrativo.
+                .requestMatchers("/api/rabbit/**").hasRole("ADMINISTRATIVO")
+
+                .requestMatchers("/api/libro/**").hasAnyRole("ADMINISTRATIVO", "PROFESOR", "ESTUDIANTE", "APODERADO")
+                .requestMatchers("/api/comunicaciones/**").authenticated()
+                .anyRequest().authenticated()
+            )
             .exceptionHandling(exceptions -> exceptions
                 .authenticationEntryPoint(customAuthenticationEntryPoint)
                 .accessDeniedHandler(customAccessDeniedHandler)
