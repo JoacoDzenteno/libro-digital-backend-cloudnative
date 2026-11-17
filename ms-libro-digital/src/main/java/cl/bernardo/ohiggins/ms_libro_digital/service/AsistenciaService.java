@@ -5,6 +5,7 @@ import cl.bernardo.ohiggins.ms_libro_digital.model.Asistencia;
 import cl.bernardo.ohiggins.ms_libro_digital.repository.AsistenciaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import cl.bernardo.ohiggins.ms_libro_digital.dto.AsistenciaRegistradaEvent;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,6 +18,7 @@ public class AsistenciaService {
     private final AsistenciaRepository asistenciaRepository;
     private final AcademicoClientService academicoClientService;
     private final NotificacionPublisher notificacionPublisher;
+    private final EventoKafkaPublisher eventoKafkaPublisher;
 
     public List<Asistencia> obtenerTodas() {
         return asistenciaRepository.findAll();
@@ -48,6 +50,12 @@ public class AsistenciaService {
                 .asunto("Nueva asistencia registrada")
                 .contenido("Se registró asistencia con estado: " + guardada.getEstado())
                 .tipoEvento("ASISTENCIA")
+                .build());
+                // Evento de streaming para Kafka (historial de asistencia)
+        eventoKafkaPublisher.publicarAsistencia(AsistenciaRegistradaEvent.builder()
+                .idAsistencia(guardada.getId())
+                .idEstudiante(guardada.getIdEstudiante())
+                .estado(guardada.getEstado().name())
                 .build());
 
         return Optional.of(guardada);
