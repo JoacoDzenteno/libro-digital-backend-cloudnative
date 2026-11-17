@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -23,7 +24,11 @@ class CalificacionServiceTest {
     private CalificacionRepository calificacionRepository;
 
     @Mock
+    private EventoKafkaPublisher eventoKafkaPublisher;
+
+    @Mock
     private NotificacionPublisher notificacionPublisher;
+    
 
     @InjectMocks
     private CalificacionService calificacionService;
@@ -119,6 +124,7 @@ class CalificacionServiceTest {
         assertNotNull(resultado);
         verify(notificacionPublisher).publicarCalificacion(any());
         verify(notificacionPublisher).publicarReporteCalificacion(any());
+        verify(eventoKafkaPublisher).publicarCalificacion(any());
     }
 
     @Test
