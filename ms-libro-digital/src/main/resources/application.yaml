@@ -27,9 +27,7 @@ spring:
       properties:
         enable.idempotence: true
         max.block.ms: 5000
-        spring.json.type.mapping: >-
-          calificacion:cl.bernardo.ohiggins.ms_libro_digital.dto.CalificacionRegistradaEvent,
-          asistencia:cl.bernardo.ohiggins.ms_libro_digital.dto.AsistenciaRegistradaEvent
+        spring.json.type.mapping: calificacion:cl.bernardo.ohiggins.ms_libro_digital.dto.CalificacionRegistradaEvent,asistencia:cl.bernardo.ohiggins.ms_libro_digital.dto.AsistenciaRegistradaEvent
 
 eureka:
   client:
@@ -57,7 +55,8 @@ mensajeria:
     routing-key: libro.hojavida.registrada
     cola: comunicaciones-hojavida-queue
     dlq: comunicaciones-hojavida-dlq
-  kafka:
-    topicos:
-      calificaciones: libro.calificaciones.eventos
-      asistencia: libro.asistencia.eventos
+
+kafka:
+  topicos:
+    calificaciones: libro.calificaciones.eventos
+    asistencia: libro.asistencia.eventos
