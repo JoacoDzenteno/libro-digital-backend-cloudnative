@@ -1,0 +1,51 @@
+server:
+  port: 8088
+
+spring:
+  application:
+    name: ms-kafka-admin
+  kafka:
+    # Los 3 brokers por la puerta EXTERNA (cuando corre desde Windows).
+    # Dentro de Docker se reemplaza por kafka-1:29092,... desde el compose.
+    bootstrap-servers: localhost:9092,localhost:9093,localhost:9094
+    admin:
+      # Si Kafka no responde al arrancar, el servicio falla en vez de seguir a ciegas
+      fail-fast: true
+      # Si un tópico ya existe con otra configuración, la alinea con la de este archivo
+      modify-topic-configs: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+# Tópicos del contrato: se crean al arrancar con estos parámetros.
+# retencion-ms: 365 días = 31536000000 | 90 días = 7776000000 | 30 días = 2592000000
+kafka-admin:
+  topicos:
+    - nombre: libro.calificaciones.eventos
+      particiones: 3
+      replicas: 3
+      retencion-ms: 31536000000
+      cleanup-policy: delete
+      min-insync-replicas: 2
+    - nombre: libro.asistencia.eventos
+      particiones: 6
+      replicas: 3
+      retencion-ms: 7776000000
+      cleanup-policy: delete
+      min-insync-replicas: 2
+    - nombre: libro.calificaciones.eventos.DLT
+      particiones: 3
+      replicas: 3
+      retencion-ms: 2592000000
+      cleanup-policy: delete
+      min-insync-replicas: 2
+    - nombre: libro.asistencia.eventos.DLT
+      particiones: 6
+      replicas: 3
+      retencion-ms: 2592000000
+      cleanup-policy: delete
+      min-insync-replicas: 2
