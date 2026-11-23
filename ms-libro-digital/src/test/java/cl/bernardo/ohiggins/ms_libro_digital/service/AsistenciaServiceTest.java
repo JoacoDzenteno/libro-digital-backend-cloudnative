@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -24,6 +25,9 @@ class AsistenciaServiceTest {
 
     @Mock
     private AcademicoClientService academicoClientService;
+
+    @Mock
+    private EventoKafkaPublisher eventoKafkaPublisher;
 
     @Mock
     private NotificacionPublisher notificacionPublisher;
@@ -99,6 +103,7 @@ class AsistenciaServiceTest {
         assertTrue(resultado.isEmpty());
         verify(asistenciaRepository, never()).save(any());
         verify(notificacionPublisher, never()).publicarAsistencia(any());
+        verify(eventoKafkaPublisher, never()).publicarAsistencia(any());
     }
 
     @Test
@@ -117,6 +122,7 @@ class AsistenciaServiceTest {
         assertNotNull(nueva.getFecha());
         assertTrue(resultado.isPresent());
         verify(notificacionPublisher).publicarAsistencia(any());
+        verify(eventoKafkaPublisher).publicarAsistencia(any());
     }
 
     @Test

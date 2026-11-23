@@ -18,6 +18,16 @@ spring:
     port: 5672
     username: guest
     password: guest
+  kafka:
+    bootstrap-servers: localhost:9092,localhost:9093,localhost:9094
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      properties:
+        enable.idempotence: true
+        max.block.ms: 5000
+        spring.json.type.mapping: calificacion:cl.bernardo.ohiggins.ms_libro_digital.dto.CalificacionRegistradaEvent,asistencia:cl.bernardo.ohiggins.ms_libro_digital.dto.AsistenciaRegistradaEvent
 
 eureka:
   client:
@@ -45,3 +55,8 @@ mensajeria:
     routing-key: libro.hojavida.registrada
     cola: comunicaciones-hojavida-queue
     dlq: comunicaciones-hojavida-dlq
+
+kafka:
+  topicos:
+    calificaciones: libro.calificaciones.eventos
+    asistencia: libro.asistencia.eventos

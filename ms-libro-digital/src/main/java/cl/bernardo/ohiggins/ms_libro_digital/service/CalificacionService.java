@@ -1,11 +1,13 @@
 package cl.bernardo.ohiggins.ms_libro_digital.service;
 
+
 import cl.bernardo.ohiggins.ms_libro_digital.dto.NotificacionEvent;
 import cl.bernardo.ohiggins.ms_libro_digital.dto.ReporteEvent;
 import cl.bernardo.ohiggins.ms_libro_digital.model.Calificacion;
 import cl.bernardo.ohiggins.ms_libro_digital.repository.CalificacionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import cl.bernardo.ohiggins.ms_libro_digital.dto.CalificacionRegistradaEvent;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,6 +19,7 @@ public class CalificacionService {
 
     private final CalificacionRepository calificacionRepository;
     private final NotificacionPublisher notificacionPublisher;
+    private final EventoKafkaPublisher eventoKafkaPublisher;
 
     public List<Calificacion> obtenerTodas() {
         return calificacionRepository.findAll();
@@ -56,6 +59,14 @@ public class CalificacionService {
                 .idCurso(guardada.getIdCurso()) // Usamos idCurso en lugar del antiguo idGeneradoPor
                 .tipoReporte("CALIFICACION") // Agregamos el tipo de reporte requerido
                 .contenido("Calificación " + guardada.getNota() + " registrada en el período " + guardada.getPeriodo())
+                .build());
+                // Evento de streaming para Kafka (historial de notas)
+        eventoKafkaPublisher.publicarCalificacion(CalificacionRegistradaEvent.builder()
+                .idCalificacion(guardada.getId())
+                .idEstudiante(guardada.getIdEstudiante())
+                .idCurso(guardada.getIdCurso())
+                .nota(guardada.getNota())
+                .periodo(guardada.getPeriodo())
                 .build());
 
         return guardada;
