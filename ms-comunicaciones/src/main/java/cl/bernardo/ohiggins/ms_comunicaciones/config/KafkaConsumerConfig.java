@@ -1,6 +1,8 @@
 package cl.bernardo.ohiggins.ms_comunicaciones.config;
 
 import cl.bernardo.ohiggins.ms_comunicaciones.exception.ApoderadoNoEncontradoException;
+import cl.bernardo.ohiggins.ms_comunicaciones.exception.EventoInvalidoException;
+
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.ByteArraySerializer;
 import org.apache.kafka.common.serialization.Serializer;
@@ -17,6 +19,7 @@ import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.kafka.support.serializer.DelegatingByTypeSerializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.util.backoff.FixedBackOff;
+import cl.bernardo.ohiggins.ms_comunicaciones.exception.EventoInvalidoException;
 
 import java.util.Map;
 
@@ -61,7 +64,8 @@ public class KafkaConsumerConfig {
                         record.partition()));
                 DefaultErrorHandler handler = new DefaultErrorHandler(recoverer, new FixedBackOff(1000L, 3L));
         // Si no hay apoderado no se arregla reintentando: va directo al DLT
-        handler.addNotRetryableExceptions(ApoderadoNoEncontradoException.class);
+        // Errores NO recuperables: reintentar no los arregla, van directo al DLT
+        handler.addNotRetryableExceptions(ApoderadoNoEncontradoException.class, EventoInvalidoException.class);
         return handler;
     }
 }
