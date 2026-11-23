@@ -21,6 +21,19 @@ spring:
     listener:
       simple:
         acknowledge-mode: manual
+  kafka:
+    bootstrap-servers: localhost:9092,localhost:9093,localhost:9094
+    consumer:
+      group-id: comunicaciones-alertas
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.type.mapping: calificacion:cl.bernardo.ohiggins.ms_comunicaciones.dto.CalificacionRegistradaEvent,asistencia:cl.bernardo.ohiggins.ms_comunicaciones.dto.AsistenciaRegistradaEvent
+        spring.json.trusted.packages: cl.bernardo.ohiggins.ms_comunicaciones.dto
+    listener:
+      ack-mode: record
 
 eureka:
   client:
@@ -44,3 +57,10 @@ mensajeria:
     routing-key: libro.hojavida.registrada
     cola: comunicaciones-hojavida-queue
     dlq: comunicaciones-hojavida-dlq
+
+kafka:
+  topicos:
+    calificaciones: libro.calificaciones.eventos
+    asistencia: libro.asistencia.eventos
+    calificaciones-dlt: libro.calificaciones.eventos.DLT
+    asistencia-dlt: libro.asistencia.eventos.DLT
