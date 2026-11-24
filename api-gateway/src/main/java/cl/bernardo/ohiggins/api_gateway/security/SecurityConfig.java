@@ -92,6 +92,8 @@ public class SecurityConfig {
 
                 // Administracion de RabbitMQ (ms-rabbit-admin): solo personal administrativo.
                 .requestMatchers("/api/rabbit/**").hasRole("ADMINISTRATIVO")
+                // Administración de Kafka (ms-kafka-admin): solo personal administrativo.
+                .requestMatchers("/api/kafka/**").hasRole("ADMINISTRATIVO")
 
                 .requestMatchers("/api/libro/**").hasAnyRole("ADMINISTRATIVO", "PROFESOR", "ESTUDIANTE", "APODERADO")
                 .requestMatchers("/api/comunicaciones/**").authenticated()

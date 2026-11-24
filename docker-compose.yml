@@ -185,7 +185,7 @@ services:
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-1:29092,kafka-2:29092,kafka-3:29092
     networks:
       - spring-net
-      
+
   eureka-server:
     build: ./eureka-server
     container_name: eureka-server
@@ -254,10 +254,19 @@ services:
         condition: service_started
       rabbitmq:
         condition: service_healthy
+      # Kafka (EP5): espera a que los 3 brokers acepten conexiones
+      kafka-1:
+        condition: service_healthy
+      kafka-2:
+        condition: service_healthy
+      kafka-3:
+        condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/db_libro_digital
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
       SPRING_RABBITMQ_HOST: rabbitmq
+      # Dentro de Docker se usa la puerta INTERNA de los brokers
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-1:29092,kafka-2:29092,kafka-3:29092
     ports:
       - "8084:8084"
     networks:
@@ -273,10 +282,19 @@ services:
         condition: service_started
       rabbitmq:
         condition: service_healthy
+      # Kafka (EP5): espera a que los 3 brokers acepten conexiones
+      kafka-1:
+        condition: service_healthy
+      kafka-2:
+        condition: service_healthy
+      kafka-3:
+        condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/db_comunicaciones
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
       SPRING_RABBITMQ_HOST: rabbitmq
+      # Dentro de Docker se usa la puerta INTERNA de los brokers
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-1:29092,kafka-2:29092,kafka-3:29092
     ports:
       - "8085:8085"
     networks:
@@ -292,10 +310,19 @@ services:
         condition: service_started
       rabbitmq:
         condition: service_healthy
+      # Kafka (EP5): espera a que los 3 brokers acepten conexiones
+      kafka-1:
+        condition: service_healthy
+      kafka-2:
+        condition: service_healthy
+      kafka-3:
+        condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/db_reportes
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
       SPRING_RABBITMQ_HOST: rabbitmq
+      # Dentro de Docker se usa la puerta INTERNA de los brokers
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-1:29092,kafka-2:29092,kafka-3:29092
     ports:
       - "8086:8086"
     networks:
@@ -317,6 +344,26 @@ services:
     networks:
       - spring-net
 
+  ms-kafka-admin:
+    build: ./ms-kafka-admin
+    container_name: ms-kafka-admin
+    # Sin PostgreSQL: todo lo que administra vive en Kafka
+    depends_on:
+      eureka-server:
+        condition: service_started
+      kafka-1:
+        condition: service_healthy
+      kafka-2:
+        condition: service_healthy
+      kafka-3:
+        condition: service_healthy
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-1:29092,kafka-2:29092,kafka-3:29092
+    ports:
+      - "8088:8088"
+    networks:
+      - spring-net
 
   api-gateway:
     build: ./api-gateway

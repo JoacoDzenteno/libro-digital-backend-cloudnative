@@ -37,6 +37,10 @@ spring:
               uri: lb://ms-rabbit-admin
               predicates:
                 - Path=/api/rabbit/**
+            - id: ms-kafka-admin
+              uri: lb://ms-kafka-admin
+              predicates:
+                - Path=/api/kafka/**
   security:
     oauth2:
       resourceserver:
